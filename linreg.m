@@ -1,5 +1,9 @@
+%% Linear Regression
+% This file generates "n" random points classified using a linear function
+% and calculates the average in-sample error (Ein) and 
+% out-of-sample error (Eout) using classification by linear regression.
+
 n = 100;
-ext = 1;
 incorrect = 0;
 incorrectout = 0;
 
@@ -23,7 +27,7 @@ for runs=1:1
 
 %% Plot
 
-%Setting up points
+% Setting up points
         yplus = ones([0, 0]);
         yminus = ones([0, 0]);
         xplus = ones([0, 0]);
@@ -39,7 +43,7 @@ for runs=1:1
             end
         end
 
-% actually plotting
+% plotting original points in blue
 figure
 axis([-1, 1, -1, 1])
 plot (xplus, yplus, '+')
@@ -49,7 +53,7 @@ plot (xminus, yminus, 'o')
 hold on
 refline(slope,intercept)
 
-%% Find w using Lin Reg
+%% Find w using Linear Regression
 X = horzcat(ones([n,1]), x1, x2);
 
 pinvX = inv(X.' * X) * X.';
@@ -65,7 +69,7 @@ reclass = X * w;
         xplus = ones([0, 0]);
         xminus = ones([0, 0]);
         
-        %only plot points that are right st wrong pts stay blue
+        %only plot points that are right so wrong pts stay blue
         for a=1:n
             if (reclass(a) > 0) &&  (y(a) > 0)
                 xplus = [xplus; x1(a)];
@@ -75,12 +79,13 @@ reclass = X * w;
                 xminus = [xminus; x1(a)];
                 yminus = [yminus; x2(a)];
             else
+                % increment count of incorrect classification
                 incorrect = incorrect + 1;
             end
             
         end
 
-% actualyl plotting
+% actually plotting
 
 hold on
 plot (xplus, yplus, '+ g')
@@ -90,49 +95,13 @@ plot (xminus, yminus, 'o g')
 hold on
 %refline(w(2),w(3))
 
-
-%% Check how correct it is (compare new classification to target)
-%{
-for b=1:n
-    if data(b,1) * w(2) + w(1) < data(b,2) 
-        if (data(b,3) < 0)    
-          incorrect = incorrect + 1;
-        end
-        
-    else
-        if (data(b,3) > 0) 
-          incorrect = incorrect + 1;
-        end
-    end
-end
-%}
-
-% another way to classify pts with hypothesis
-%{
-    ynew = (data(:, 1) * w(3) + w(2) > x2) * 2 - 1;
-    %for debugging
-    check = y + ynew;
-    for b=1:n
-        if ynew(b) ~= data(b,3)   
-            incorrect = incorrect + 1;
-        end
-    end
-%}
-
-%using reclass
-%{
-for b=1:n
-        if reclass(b) ~= y(b)   
-            incorrect = incorrect + 1;
-        end
-%}
 end
 
 
 
 %% Find Eout
 
-% Generate the points.
+% Generate test points.
 	 x1out = (rand(n, 1) - 0.5)*2;
 	 x2out = (rand(n, 1) - 0.5)*2;
 	
@@ -141,22 +110,8 @@ end
      
      Xout = horzcat(ones([n,1]), x1out, x2out);
      reclassout = Xout * w;
+     
 % Check fresh points on hypothesis function 	
-%{
-for b=1:n
-    if dataout(b,1) * w(3) + w(2) < dataout(b,2) 
-        if (dataout(b,3) < 0)
-          incorrectout = incorrectout + 1;
-        end
-    else
-        if (dataout(b,3) > 0) 
-          incorrectout = incorrectout + 1;
-        end
-    end
-end
-%}
-
-%using same function as plotting
 for a=1:n
     if (reclassout(a) > 0) &&  (yout(a) > 0)
         continue
@@ -168,7 +123,7 @@ for a=1:n
 
 end
 
-avg = incorrect/n/runs
+Ein = incorrect/n/runs
 Eout = incorrectout/n/runs
 
 

@@ -18,10 +18,7 @@ for runs=1:1
 	
 	% Assign the dependent values. if y(x1, x2) > x, make it +1
 	 y = (x1 * slope + intercept > x2) * 2 - 1;
-     
-	% Return the values.
-    %data = horzcat(x1, x2, y);
-    
+  
     %Classify points
         yplus = ones([0, 0]);
         yminus = ones([0, 0]);
@@ -46,7 +43,6 @@ end
 	
      yout = (x1out * slope + intercept > x2out) * 2 - 1;
     
-     
      Xout = horzcat(ones([N,1]), x1out, x2out);        
     
    %% set weights
@@ -55,14 +51,14 @@ end
     %% do log reg
     iteration = 0;
     sumIterations = 0;
-for run=1:100
+
+    for run=1:100
     
     while 1
         iteration = iteration + 1;
         p = randperm(N);
         
         for i = 1:N
-        %for i = 1:5
             x2i = x2(p(i));
             x = x1(p(i));
             xvect = [1 x x2i];
@@ -88,9 +84,11 @@ for run=1:100
         Ein_out = log(1 + exp(-yout(a)*dot(w, Xout(a,:))))
         sum = sum + Ein_out;
     end
+    
     %for iteration avg
     sumIterations = sumIterations + iteration
- end %run
+    
+ end %end of run
  
  avgEout = sum/N/run
  avg = sumIterations / run

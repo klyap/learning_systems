@@ -1,8 +1,14 @@
-N = 100;
+%% Stochastic Gradient Descent
+% This file generates "n" random points classified using a linear function
+% and calculates the average iterations needed (avgIterations) and 
+% out-of-sample error (Eout) using classification by stochastic gradient
+% descent.
+
+N = 100; % number of points
 n = 0.01;
 
 for runs=1:1
-	for debug = 1:1
+	
     % Generate the points.
 	 x1 = (rand(N, 1) - 0.5)*2;
 	 x2 = (rand(N, 1) - 0.5)*2;
@@ -15,9 +21,6 @@ for runs=1:1
 	
 	% Assign the dependent values. if y(x1, x2) > x, make it +1
 	 y = (x1 * slope + intercept > x2) * 2 - 1;
-     
-	% Return the values.
-    %data = horzcat(x1, x2, y);
     
     %Classify points
         yplus = ones([0, 0]);
@@ -34,7 +37,7 @@ for runs=1:1
                 yminus = [yminus; x2(a)];
             end
         end
-    end
+    
 
       %% Find Eout
 
@@ -55,46 +58,43 @@ for runs=1:1
     iteration = 0;
     sumIterations = 0;
     sum = 0;
-for run=1:100
-    
-    while 1
-        iteration = iteration + 1;
-        p = randperm(N);
-        wnew = w;
-        for i = 1:N
-        %for i = 1:5
-            x2i = x2(p(i));
-            x = x1(p(i));
-            xvect = [1 x x2i];
-            
-            %transpose = w.'*x
-            Ein = -(y(p(i))*xvect)/(1 + exp(y(p(i))*dot(wnew.',xvect)));
-            wnew = wnew - (n * Ein);
+
+    for run=1:100
+
+        while 1
+            iteration = iteration + 1;
+            p = randperm(N);
+            wnew = w;
+            for i = 1:N
+                x2i = x2(p(i));
+                x = x1(p(i));
+                xvect = [1 x x2i];
+
+                Ein = -(y(p(i))*xvect)/(1 + exp(y(p(i))*dot(wnew.',xvect)));
+                wnew = wnew - (n * Ein);
+            end
+
+            check = norm(w - wnew);
+
+            if check < 0.01
+                break
+            end
+
+            w = wnew;
+        end
+
+
+        sumIterations = sumIterations + iteration;
+
+        for a=1:N
+           Ein_out = log(1 + exp(-yout(a)*dot(w, Xout(a,:))));
+           sum = sum + Ein_out;
         end
         
-        check = norm(w - wnew);
-    
-        if check < 0.01
-            break
-        end
-        
-        w = wnew;
-    end
-    
-        
-    sumIterations = sumIterations + iteration;
-    
-    for a=1:N
-        %classification = yout(a)
-        %therow = Xout(a,:)
-       Ein_out = log(1 + exp(-yout(a)*dot(w, Xout(a,:))));
-       sum = sum + Ein_out;
-    end
- end %runs
-  avg = sumIterations / run
-  avgEout = sum/N/run
-% Check fresh points on hypothesis function 	
+     end % of runs
  
+    avgIterations = sumIterations / run
+    avgEout = sum / N / run
  
 
 end
